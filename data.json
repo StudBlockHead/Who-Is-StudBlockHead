@@ -6,12 +6,12 @@
   "bio": "Hello, my name is Cubist! I've been on ROBLOX since 2017. I invite you to check out stuff about myself!",
   "theme": {
     "backgroundImage": "assets/background.png",
-    "cardBg": "#180880",
-    "textMain": "#332c40",
-    "textSub": "#786f8a",
-    "accent": "#ff6b81",
-    "accentHover": "#ff4757",
-    "btnBg": "#f1f2f6"
+    "cardBg": "#131728",
+    "textMain": "#FFFFFF",
+    "textSub": "#A3B3D1",
+    "accent": "#FF477E",
+    "accentHover": "#FF7597",
+    "btnBg": "#1E2640"
   },
   "audio": {
     "bgMusic": "assets/bg-music.mp3",
