@@ -1,0 +1,18 @@
+{
+  "name": "Cubist",
+  "handle": "@StudBlockHead",
+  "avatar": "assets/avatar.png",
+  "status": "Blocking In",
+  "bio": "Hello, my name is Cubist! I've been on ROBLOX since 2017.",
+  "socials": [
+    { "name": "YouTube", "url": "https://youtube.com", "icon": "📺" },
+    { "name": "Discord", "url": "https://discord.com", "icon": "💬" }
+  ],
+  "links": [
+    { "title": "🎮 My Roblox Profile", "url": "https://roblox.com", "description": "Check out my games and creations" },
+    { "title": "🎵 Favorite Playlist", "url": "https://spotify.com", "description": "What I am currently listening to on loop" },
+    { "title": "📁 Personal Portfolio / Projects", "url": "https://github.com", "description": "My open source tools and side projects" },
+    { "title": "☕ Buy Me a Coffee", "url": "https://ko-fi.com", "description": "Support my random late-night builds" }
+  ]
+}
+
