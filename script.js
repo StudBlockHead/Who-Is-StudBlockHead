@@ -1,15 +1,89 @@
 document.addEventListener("DOMContentLoaded", () => {
+  let bgAudio = null;
+  let clickAudio = null;
+  let isMusicPlaying = false;
+
   fetch("data.json")
     .then((response) => response.json())
     .then((data) => {
-      // Set Profile Header Info
+      // 1. APPLY CUSTOM THEME & BACKGROUND FROM JSON
+      if (data.theme) {
+        const root = document.documentElement;
+        if (data.theme.cardBg) root.style.setProperty("--card-bg", data.theme.cardBg);
+        if (data.theme.textMain) root.style.setProperty("--text-main", data.theme.textMain);
+        if (data.theme.textSub) root.style.setProperty("--text-sub", data.theme.textSub);
+        if (data.theme.accent) root.style.setProperty("--accent", data.theme.accent);
+        if (data.theme.btnBg) root.style.setProperty("--btn-bg", data.theme.btnBg);
+
+        if (data.theme.backgroundImage) {
+          document.body.style.backgroundImage = `url('${data.theme.backgroundImage}')`;
+        }
+      }
+
+      // 2. SETUP AUDIO (Music + SFX)
+      if (data.audio) {
+        if (data.audio.bgMusic) {
+          bgAudio = new Audio(data.audio.bgMusic);
+          bgAudio.loop = true;
+          bgAudio.volume = 0.4; // 40% volume for comfortable background listening
+        }
+
+        if (data.audio.clickSound) {
+          clickAudio = new Audio(data.audio.clickSound);
+          clickAudio.volume = 0.6;
+        }
+      }
+
+      const musicBtn = document.getElementById("music-btn");
+      const musicStatus = document.getElementById("music-status");
+
+      // Function to play click SFX
+      const playClickSFX = () => {
+        if (clickAudio) {
+          clickAudio.currentTime = 0;
+          clickAudio.play().catch(() => {});
+        }
+      };
+
+      // Toggle Music Button
+      musicBtn.addEventListener("click", () => {
+        playClickSFX();
+        if (!bgAudio) return;
+
+        if (isMusicPlaying) {
+          bgAudio.pause();
+          musicStatus.textContent = "OFF";
+          isMusicPlaying = false;
+        } else {
+          bgAudio.play().then(() => {
+            musicStatus.textContent = "ON 🎵";
+            isMusicPlaying = true;
+          }).catch(() => {
+            alert("Please interact with the page first so browser allows audio playback!");
+          });
+        }
+      });
+
+      // Auto-start music on first user interaction anywhere on page
+      const startAudioOnFirstClick = () => {
+        if (bgAudio && !isMusicPlaying) {
+          bgAudio.play().then(() => {
+            musicStatus.textContent = "ON 🎵";
+            isMusicPlaying = true;
+          }).catch(() => {});
+        }
+        document.removeEventListener("click", startAudioOnFirstClick);
+      };
+      document.addEventListener("click", startAudioOnFirstClick);
+
+      // 3. SET PROFILE HEADER
       document.getElementById("name").textContent = data.name;
       document.getElementById("handle").textContent = data.handle;
       document.getElementById("status").textContent = data.status;
       document.getElementById("bio").textContent = data.bio;
       document.getElementById("avatar").src = data.avatar;
 
-      // Helper function to get Google's Favicon URL from any full link
+      // Helper for Google Favicons
       const getFaviconUrl = (pageUrl) => {
         try {
           const domain = new URL(pageUrl).hostname;
@@ -19,25 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // Render Social Icons with Favicons
-      const socialsContainer = document.getElementById("socials");
-      data.socials.forEach((social) => {
-        const a = document.createElement("a");
-        a.href = social.url;
-        a.className = "social-item";
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-
-        const faviconSrc = getFaviconUrl(social.url);
-        a.innerHTML = `
-          <img src="${faviconSrc}" alt="${social.name} icon" class="favicon-icon">
-          <span>${social.name}</span>
-        `;
-        socialsContainer.appendChild(a);
-      });
-
-      // Render Main Links with Favicons
+      // 4. RENDER UNIFIED LINKS LIST
       const linksContainer = document.getElementById("links-container");
+      
       data.links.forEach((link) => {
         const a = document.createElement("a");
         a.href = link.url;
@@ -49,13 +107,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         a.innerHTML = `
           <div class="link-content">
-            <img src="${faviconSrc}" alt="link icon" class="link-favicon">
+            <img src="${faviconSrc}" alt="icon" class="link-favicon">
             <div class="link-text">
               <span class="link-title">${link.title}</span>
               ${link.description ? `<span class="link-desc">${link.description}</span>` : ""}
             </div>
           </div>
         `;
+
+        // Play SFX on hover/click
+        a.addEventListener("mouseenter", playClickSFX);
+        a.addEventListener("click", playClickSFX);
 
         linksContainer.appendChild(a);
       });
