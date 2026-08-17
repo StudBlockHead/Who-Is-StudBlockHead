@@ -9,7 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("bio").textContent = data.bio;
       document.getElementById("avatar").src = data.avatar;
 
-      // Render Social Icons
+      // Helper function to get Google's Favicon URL from any full link
+      const getFaviconUrl = (pageUrl) => {
+        try {
+          const domain = new URL(pageUrl).hostname;
+          return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+        } catch (e) {
+          return "";
+        }
+      };
+
+      // Render Social Icons with Favicons
       const socialsContainer = document.getElementById("socials");
       data.socials.forEach((social) => {
         const a = document.createElement("a");
@@ -17,11 +27,16 @@ document.addEventListener("DOMContentLoaded", () => {
         a.className = "social-item";
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.innerHTML = `${social.icon} ${social.name}`;
+
+        const faviconSrc = getFaviconUrl(social.url);
+        a.innerHTML = `
+          <img src="${faviconSrc}" alt="${social.name} icon" class="favicon-icon">
+          <span>${social.name}</span>
+        `;
         socialsContainer.appendChild(a);
       });
 
-      // Render Main Links
+      // Render Main Links with Favicons
       const linksContainer = document.getElementById("links-container");
       data.links.forEach((link) => {
         const a = document.createElement("a");
@@ -30,9 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
         a.target = "_blank";
         a.rel = "noopener noreferrer";
 
+        const faviconSrc = getFaviconUrl(link.url);
+
         a.innerHTML = `
-          <span class="link-title">${link.title}</span>
-          ${link.description ? `<span class="link-desc">${link.description}</span>` : ""}
+          <div class="link-content">
+            <img src="${faviconSrc}" alt="link icon" class="link-favicon">
+            <div class="link-text">
+              <span class="link-title">${link.title}</span>
+              ${link.description ? `<span class="link-desc">${link.description}</span>` : ""}
+            </div>
+          </div>
         `;
 
         linksContainer.appendChild(a);
@@ -40,4 +62,3 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch((error) => console.error("Error loading profile data:", error));
 });
-
