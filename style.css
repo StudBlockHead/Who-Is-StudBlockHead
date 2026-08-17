@@ -1,25 +1,168 @@
-/* Social item alignment with favicon */
-.social-item {
+:root {
+  --bg-gradient: linear-gradient(135deg, #a8edf0 0%, #fed6e3 100%);
+  --card-bg: #ffffff;
+  --text-main: #332c40;
+  --text-sub: #786f8a;
+  --accent: #ff6b81;
+  --accent-hover: #ff4757;
+  --btn-bg: #f1f2f6;
+  --border-radius: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-gradient);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+  position: relative;
+}
+
+/* Floating Retro Audio Controls */
+.audio-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.audio-btn {
+  background: var(--card-bg);
+  border: 3px solid var(--accent);
+  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.audio-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: var(--accent);
+  color: white;
+}
+
+.audio-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Main Card */
+.card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 450px;
+  border-radius: var(--border-radius);
+  padding: 32px 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12), 0 0 0 4px rgba(255, 255, 255, 0.8);
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.avatar-wrapper img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--accent);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-wrapper img:hover {
+  transform: scale(1.1) rotate(-4deg);
+}
+
+h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2rem;
+  margin-top: 14px;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+.handle {
+  color: var(--text-sub);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.status-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
   background: var(--btn-bg);
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-main);
-  transition: all 0.2s ease;
+  margin-bottom: 18px;
 }
 
-.favicon-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #2ed573;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #2ed573;
 }
 
-/* Link button layout with favicon */
+.bio-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  margin-bottom: 26px;
+  font-weight: 600;
+}
+
+/* Unified Links List */
+.links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.link-button {
+  display: block;
+  text-decoration: none;
+  background: var(--btn-bg);
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 2px solid transparent;
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.link-button:hover {
+  background: #ffffff;
+  border-color: var(--accent);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+.link-button:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
 .link-content {
   display: flex;
   align-items: center;
@@ -28,12 +171,13 @@
 }
 
 .link-favicon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   flex-shrink: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  padding: 2px;
+  background-color: #ffffff;
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .link-text {
@@ -41,7 +185,22 @@
   flex-direction: column;
 }
 
-.link-button:hover .link-favicon {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
+.link-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-main);
+  font-family: 'Fredoka', sans-serif;
 }
+
+.link-desc {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  font-weight: 700;
+  }
