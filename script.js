@@ -6,26 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch("data.json")
     .then((response) => response.json())
     .then((data) => {
-      // 1. APPLY CUSTOM THEME & BACKGROUND FROM JSON
-      if (data.theme) {
-        const root = document.documentElement;
-        if (data.theme.cardBg) root.style.setProperty("--card-bg", data.theme.cardBg);
-        if (data.theme.textMain) root.style.setProperty("--text-main", data.theme.textMain);
-        if (data.theme.textSub) root.style.setProperty("--text-sub", data.theme.textSub);
-        if (data.theme.accent) root.style.setProperty("--accent", data.theme.accent);
-        if (data.theme.btnBg) root.style.setProperty("--btn-bg", data.theme.btnBg);
-
-        if (data.theme.backgroundImage) {
-          document.body.style.backgroundImage = `url('${data.theme.backgroundImage}')`;
-        }
-      }
-
-      // 2. SETUP AUDIO (Music + SFX)
+      // 1. SETUP AUDIO
       if (data.audio) {
         if (data.audio.bgMusic) {
           bgAudio = new Audio(data.audio.bgMusic);
           bgAudio.loop = true;
-          bgAudio.volume = 0.4; // 40% volume for comfortable background listening
+          bgAudio.volume = 0.4; // Comfort background volume
         }
 
         if (data.audio.clickSound) {
@@ -45,38 +31,75 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // Toggle Music Button
-      musicBtn.addEventListener("click", () => {
-        playClickSFX();
-        if (!bgAudio) return;
-
-        if (isMusicPlaying) {
-          bgAudio.pause();
-          musicStatus.textContent = "OFF";
-          isMusicPlaying = false;
-        } else {
+      // Function to attempt playing background music
+      const startMusic = () => {
+        if (bgAudio && !isMusicPlaying) {
           bgAudio.play().then(() => {
-            musicStatus.textContent = "ON 🎵";
             isMusicPlaying = true;
-          }).catch(() => {
-            alert("Please interact with the page first so browser allows audio playback!");
+            if (musicStatus) musicStatus.textContent = "ON 🎵";
+          }).catch((err) => {
+            console.log("Autoplay blocked pending user interaction:", err);
           });
+        }
+      };
+
+      // Function to pause background music
+      const pauseMusic = () => {
+        if (bgAudio && isMusicPlaying) {
+          bgAudio.pause();
+          isMusicPlaying = false;
+          if (musicStatus) musicStatus.textContent = "OFF";
+        }
+      };
+
+      // AUTO-PLAY: Play immediately on page load (if browser allows) OR on very first touch/click
+      startMusic();
+      
+      const handleFirstInteraction = () => {
+        startMusic();
+        window.removeEventListener("touchstart", handleFirstInteraction);
+        window.removeEventListener("click", handleFirstInteraction);
+        window.removeEventListener("scroll", handleFirstInteraction);
+      };
+
+      window.addEventListener("touchstart", handleFirstInteraction, { passive: true });
+      window.addEventListener("click", handleFirstInteraction);
+      window.addEventListener("scroll", handleFirstInteraction, { passive: true });
+
+      // PAGE VISIBILITY API: Pause music when tab is hidden or user leaves app
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (bgAudio && isMusicPlaying) {
+            bgAudio.pause();
+          }
+        } else {
+          if (bgAudio && isMusicPlaying) {
+            bgAudio.play().catch(() => {});
+          }
         }
       });
 
-      // Auto-start music on first user interaction anywhere on page
-      const startAudioOnFirstClick = () => {
-        if (bgAudio && !isMusicPlaying) {
-          bgAudio.play().then(() => {
-            musicStatus.textContent = "ON 🎵";
-            isMusicPlaying = true;
-          }).catch(() => {});
-        }
-        document.removeEventListener("click", startAudioOnFirstClick);
-      };
-      document.addEventListener("click", startAudioOnFirstClick);
+      // Pause audio when page unloads or user navigates away
+      window.addEventListener("pagehide", () => {
+        if (bgAudio) bgAudio.pause();
+      });
 
-      // 3. SET PROFILE HEADER
+      // Manual Music Toggle Button
+      if (musicBtn) {
+        musicBtn.addEventListener("click", (e) => {
+          e.stopPropagation(); // Prevent triggering interaction listener
+          playClickSFX();
+          if (!bgAudio) return;
+
+          if (isMusicPlaying) {
+            pauseMusic();
+          } else {
+            startMusic();
+          }
+        });
+      }
+
+      // 2. SET PROFILE HEADER
       document.getElementById("name").textContent = data.name;
       document.getElementById("handle").textContent = data.handle;
       document.getElementById("status").textContent = data.status;
@@ -93,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // 4. RENDER UNIFIED LINKS LIST
+      // 3. RENDER LINKS LIST
       const linksContainer = document.getElementById("links-container");
       
       data.links.forEach((link) => {
@@ -115,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
 
-        // Play SFX on hover/click
         a.addEventListener("mouseenter", playClickSFX);
         a.addEventListener("click", playClickSFX);
 
