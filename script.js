@@ -3,10 +3,59 @@ document.addEventListener("DOMContentLoaded", () => {
   let clickAudio = null;
   let isMusicPlaying = false;
 
+  // --- VISITOR COUNTER LOGIC ---
+  const countElement = document.getElementById("view-count");
+  const namespace = "studblockhead_whois"; // Unique namespace for your counter
+  const key = "page_views";
+
+  // Check for search engine crawlers & automated bots
+  const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+
+  // Check if this specific browser/device has already visited
+  const hasVisited = localStorage.getItem("has_visited_studblockhead");
+
+  if (isBot) {
+    // If it's a bot, only read current count without incrementing
+    fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (countElement) countElement.textContent = `${data.value || 0} views`;
+      })
+      .catch(() => {
+        if (countElement) countElement.textContent = "1 view";
+      });
+  } else if (!hasVisited) {
+    // First time human visitor: Increment counter and store flag in localStorage
+    fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+      .then((res) => res.json())
+      .then((data) => {
+        localStorage.setItem("has_visited_studblockhead", "true");
+        if (countElement) countElement.textContent = `${data.value} views`;
+      })
+      .catch(() => {
+        if (countElement) countElement.textContent = "1 view";
+      });
+  } else {
+    // Returning visitor or site owner: Only fetch current count without incrementing
+    fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (countElement) countElement.textContent = `${data.value || 1} views`;
+      })
+      .catch(() => {
+        if (countElement) countElement.textContent = "1 view";
+      });
+  }
+
+  // --- MAIN PROFILE DATA FETCH ---
   fetch("data.json")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
-      // 1. SETUP AUDIO
       if (data.audio) {
         if (data.audio.bgMusic) {
           bgAudio = new Audio(data.audio.bgMusic);
@@ -35,9 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
           bgAudio.play().then(() => {
             isMusicPlaying = true;
             if (musicStatus) musicStatus.textContent = "ON 🎵";
-          }).catch((err) => {
-            console.log("Autoplay blocked pending user interaction:", err);
-          });
+          }).catch(() => {});
         }
       };
 
@@ -49,9 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // Auto-start music on first touch/click
       startMusic();
-      
       const handleFirstInteraction = () => {
         startMusic();
         window.removeEventListener("touchstart", handleFirstInteraction);
@@ -63,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.addEventListener("click", handleFirstInteraction);
       window.addEventListener("scroll", handleFirstInteraction, { passive: true });
 
-      // Page visibility & tab switching handling
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
           if (bgAudio && isMusicPlaying) bgAudio.pause();
@@ -90,10 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // 2. SET PROFILE HEADER
       document.getElementById("name").textContent = data.name;
       
-      // Clean display for handle
       const handleElem = document.getElementById("handle");
       if (data.handle) {
         handleElem.textContent = data.handle.startsWith("@") ? data.handle : `@${data.handle}`;
@@ -105,7 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("bio").textContent = data.bio;
       document.getElementById("avatar").src = data.avatar;
 
-      // Favicon fetcher (Works for X.com, Reddit, Roblox, YouTube, etc.)
       const getFaviconUrl = (pageUrl) => {
         try {
           const domain = new URL(pageUrl).hostname;
@@ -115,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // 3. RENDER LINKS LIST
       const linksContainer = document.getElementById("links-container");
       
       data.links.forEach((link) => {
@@ -143,5 +183,10 @@ document.addEventListener("DOMContentLoaded", () => {
         linksContainer.appendChild(a);
       });
     })
-    .catch((error) => console.error("Error loading profile data:", error));
+    .catch((error) => {
+      console.error("Error loading profile data:", error);
+      document.getElementById("name").textContent = "Error Loading Profile";
+      document.getElementById("bio").textContent = "Check data.json formatting in your repository!";
+    });
 });
+                                
