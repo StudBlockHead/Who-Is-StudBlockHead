@@ -30,7 +30,7 @@ body {
   position: relative;
 }
 
-/* Audio Control Button */
+/* Audio Control Button (Top Right) */
 .audio-controls {
   position: fixed;
   top: 20px;
@@ -57,6 +57,30 @@ body {
 .audio-btn:hover {
   background: var(--accent);
   color: #ffffff;
+}
+
+/* Visitor Counter Widget (Bottom Left) */
+.visitor-counter {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid #30363d;
+  padding: 8px 14px;
+  border-radius: 20px;
+  color: var(--text-sub);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.eye-icon {
+  font-size: 0.95rem;
 }
 
 /* Main Card */
@@ -154,13 +178,16 @@ h1 {
   text-align: left;
 }
 
+/* Favicon Styling (Dark theme friendly) */
 .link-favicon {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 8px;
   flex-shrink: 0;
-  background-color: #ffffff;
-  padding: 3px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  object-fit: contain;
 }
 
 .link-text {
