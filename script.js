@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.audio.bgMusic) {
           bgAudio = new Audio(data.audio.bgMusic);
           bgAudio.loop = true;
-          bgAudio.volume = 0.4; // Comfort background volume
+          bgAudio.volume = 0.4;
         }
 
         if (data.audio.clickSound) {
@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const musicBtn = document.getElementById("music-btn");
       const musicStatus = document.getElementById("music-status");
 
-      // Function to play click SFX
       const playClickSFX = () => {
         if (clickAudio) {
           clickAudio.currentTime = 0;
@@ -31,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // Function to attempt playing background music
       const startMusic = () => {
         if (bgAudio && !isMusicPlaying) {
           bgAudio.play().then(() => {
@@ -43,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // Function to pause background music
       const pauseMusic = () => {
         if (bgAudio && isMusicPlaying) {
           bgAudio.pause();
@@ -52,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      // AUTO-PLAY: Play immediately on page load (if browser allows) OR on very first touch/click
+      // Auto-start music on first touch/click
       startMusic();
       
       const handleFirstInteraction = () => {
@@ -66,28 +63,22 @@ document.addEventListener("DOMContentLoaded", () => {
       window.addEventListener("click", handleFirstInteraction);
       window.addEventListener("scroll", handleFirstInteraction, { passive: true });
 
-      // PAGE VISIBILITY API: Pause music when tab is hidden or user leaves app
+      // Page visibility & tab switching handling
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
-          if (bgAudio && isMusicPlaying) {
-            bgAudio.pause();
-          }
+          if (bgAudio && isMusicPlaying) bgAudio.pause();
         } else {
-          if (bgAudio && isMusicPlaying) {
-            bgAudio.play().catch(() => {});
-          }
+          if (bgAudio && isMusicPlaying) bgAudio.play().catch(() => {});
         }
       });
 
-      // Pause audio when page unloads or user navigates away
       window.addEventListener("pagehide", () => {
         if (bgAudio) bgAudio.pause();
       });
 
-      // Manual Music Toggle Button
       if (musicBtn) {
         musicBtn.addEventListener("click", (e) => {
-          e.stopPropagation(); // Prevent triggering interaction listener
+          e.stopPropagation();
           playClickSFX();
           if (!bgAudio) return;
 
@@ -101,12 +92,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 2. SET PROFILE HEADER
       document.getElementById("name").textContent = data.name;
-      document.getElementById("handle").textContent = data.handle;
+      
+      // Clean display for handle
+      const handleElem = document.getElementById("handle");
+      if (data.handle) {
+        handleElem.textContent = data.handle.startsWith("@") ? data.handle : `@${data.handle}`;
+      } else {
+        handleElem.style.display = "none";
+      }
+
       document.getElementById("status").textContent = data.status;
       document.getElementById("bio").textContent = data.bio;
       document.getElementById("avatar").src = data.avatar;
 
-      // Helper for Google Favicons
+      // Favicon fetcher (Works for X.com, Reddit, Roblox, YouTube, etc.)
       const getFaviconUrl = (pageUrl) => {
         try {
           const domain = new URL(pageUrl).hostname;
