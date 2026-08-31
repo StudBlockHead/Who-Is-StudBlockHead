@@ -3,19 +3,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let clickAudio = null;
   let isMusicPlaying = false;
 
-  // --- VISITOR COUNTER LOGIC ---
+  // VISITOR COUNTER LOGIC
   const countElement = document.getElementById("view-count");
-  const namespace = "studblockhead_whois"; // Unique namespace for your counter
+  const namespace = "studblockhead_whois";
   const key = "page_views";
 
-  // Check for search engine crawlers & automated bots
   const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
-
-  // Check if this specific browser/device has already visited
   const hasVisited = localStorage.getItem("has_visited_studblockhead");
 
   if (isBot) {
-    // If it's a bot, only read current count without incrementing
     fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
       .then((res) => res.json())
       .then((data) => {
@@ -25,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (countElement) countElement.textContent = "1 view";
       });
   } else if (!hasVisited) {
-    // First time human visitor: Increment counter and store flag in localStorage
     fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
       .then((res) => res.json())
       .then((data) => {
@@ -36,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (countElement) countElement.textContent = "1 view";
       });
   } else {
-    // Returning visitor or site owner: Only fetch current count without incrementing
     fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
       .then((res) => res.json())
       .then((data) => {
@@ -47,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // --- MAIN PROFILE DATA FETCH ---
+  // MAIN PROFILE DATA FETCH
   fetch("data.json")
     .then((response) => {
       if (!response.ok) {
@@ -143,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
         handleElem.style.display = "none";
       }
 
-      document.getElementById("status").textContent = data.status;
       document.getElementById("bio").textContent = data.bio;
       document.getElementById("avatar").src = data.avatar;
 
@@ -189,4 +182,3 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("bio").textContent = "Check data.json formatting in your repository!";
     });
 });
-                                
