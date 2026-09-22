@@ -3,16 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let clickAudio = null;
   let isMusicPlaying = false;
 
-  // VISITOR COUNTER LOGIC
+  // VISITOR COUNTER LOGIC (Modern CountAPI)
   const countElement = document.getElementById("view-count");
-  const namespace = "studblockhead_whois";
-  const key = "page_views";
+  // Unique global key for your bio site
+  const counterKey = "studblockhead_whois_pageviews";
 
   const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
   const hasVisited = localStorage.getItem("has_visited_studblockhead");
 
   if (isBot) {
-    fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+    // Crawlers only read the view count
+    fetch(`https://countapi.mileshilliard.com/api/v1/get/${counterKey}`)
       .then((res) => res.json())
       .then((data) => {
         if (countElement) countElement.textContent = `${data.value || 0} views`;
@@ -21,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (countElement) countElement.textContent = "1 view";
       });
   } else if (!hasVisited) {
-    fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+    // First time human visitor: Bump count by +1
+    fetch(`https://countapi.mileshilliard.com/api/v1/hit/${counterKey}`)
       .then((res) => res.json())
       .then((data) => {
         localStorage.setItem("has_visited_studblockhead", "true");
@@ -31,7 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (countElement) countElement.textContent = "1 view";
       });
   } else {
-    fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+    // Returning visitor / device: Read current count without bumping
+    fetch(`https://countapi.mileshilliard.com/api/v1/get/${counterKey}`)
       .then((res) => res.json())
       .then((data) => {
         if (countElement) countElement.textContent = `${data.value || 1} views`;
